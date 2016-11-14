@@ -32,7 +32,8 @@ passport.use(new GoogleStrategy(
   authConfig.google,
 
   function(accessToken, refreshToken, profile, done) {
-
+    console.log('access : ', accessToken);
+    console.log('refresh : ', refreshToken);
     // Typically you would query the database to find the user record
     // associated with this Google profile, then pass that object to the `done`
     // callback.
@@ -84,7 +85,11 @@ app.get('/login', function(req, res) {
 //   redirecting the user to google.com.  After authorization, Google
 //   will redirect the user back to this application at /auth/google/callback
 app.get('/auth/google',
-  passport.authenticate('google', { scope: ['openid email profile'] }));
+  passport.authenticate('google', {
+    scope: ['openid email profile'],
+    accessType: 'offline',
+    approvalPrompt: 'force'
+  }));
 
 // GET /auth/google/callback
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -111,7 +116,7 @@ app.get('/logout', function(req, res) {
   res.redirect('/');
 });
 
-app.listen(process.env.PORT || 3000, function() {
+app.listen(process.env.PORT || 9090, function() {
   console.log("Listening...");
 });
 
