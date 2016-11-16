@@ -105,6 +105,12 @@ app.get('/auth/google/callback',
     res.redirect('/');
   });
 
+app.get('/user', ensureAuthenticated, function(req, res) {
+  res.json({
+    user: req.user
+  })
+})
+
 app.get('/account', ensureAuthenticated, function(req, res) {
   res.render('account', {
     user: req.user
