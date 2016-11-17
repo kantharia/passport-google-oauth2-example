@@ -3,7 +3,8 @@ var authConfig = require('./config/auth'),
   passport = require('passport'),
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
   TwitterStrategy = require('passport-twitter').Strategy,
-  FacebookStrategy = require('passport-facebook').Strategy;
+  FacebookStrategy = require('passport-facebook').Strategy
+  LinkedInStrategy = require('passport-linkedin').Strategy;
 
 // Passport session setup.
 //
@@ -46,21 +47,32 @@ passport.use(new GoogleStrategy(
 // Passport middleware for Twitter Strategy
 passport.use(new TwitterStrategy(authConfig.twitter,
   function(token, tokenSecret, profile, done) {
-    done(null, profile);
+    return done(null, profile);
   }
 ));
 
 // Passport middleware for Facebook Strategy
-passport.use(new FacebookStrategy({
-    clientID: "214423002316040",
-    clientSecret: "622d17f64afd3ced467c01d86bf928e5",
-    callbackURL: "/auth/facebook/callback"
-  }, function(accessToken, refreshToken, profile, done){
+passport.use(new FacebookStrategy(authConfig.facebook,
+  function(accessToken, refreshToken, profile, done){
       console.log('Access Token : ', accessToken);
       console.log('refreshToken : ', refreshToken);
-      done(null, profile);
+      return done(null, profile);
   })
 );
+
+// Passport middleware for LinkedIn Strategy
+passport.use(new LinkedInStrategy({
+    consumerKey: "81o64ppbkdkoky",
+    consumerSecret: "8BjO1VzFBppBXeM1",
+    callbackURL: "/auth/linkedin/callback",
+    profileFields: ['id', 'first-name', 'last-name', 'email-address', 'headline']
+  },
+  function(token, tokenSecret, profile, done) {
+    console.log('LinkedIn Token : ', token);
+    console.log('LinkedIn Secret : ', tokenSecret);
+    return done(null, profile);
+  }
+))
 
 // Express 4 boilerplate
 
@@ -142,7 +154,9 @@ app.get('/auth/google/callback',
     })
   );
 
-
+/**
+ * Facebook Auth Routes
+ */
 app.get('/auth/facebook', passport.authenticate('facebook', {
     scope:['email user_about_me user_hometown user_location user_website user_work_history']
   })
@@ -154,6 +168,20 @@ app.get('/auth/facebook/callback',
   })
 );
 
+/**
+ * LinkedIn Auth routes
+ */
+app.get('/auth/linkedin', passport.authenticate('linkedin',{
+    scope: ['r_basicprofile', 'r_emailaddress']
+  })
+);
+
+app.get('/auth/linkedin/callback',
+  passport.authenticate('linkedin', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
 
 app.get('/user', ensureAuthenticated, function(req, res) {
   res.json({
