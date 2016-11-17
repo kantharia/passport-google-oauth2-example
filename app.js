@@ -2,7 +2,8 @@ var authConfig = require('./config/auth'),
   express = require('express'),
   passport = require('passport'),
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
-  TwitterStrategy = require('passport-twitter').Strategy;
+  TwitterStrategy = require('passport-twitter').Strategy,
+  FacebookStrategy = require('passport-facebook').Strategy;
 
 // Passport session setup.
 //
@@ -42,11 +43,24 @@ passport.use(new GoogleStrategy(
   }
 ));
 
+// Passport middleware for Twitter Strategy
 passport.use(new TwitterStrategy(authConfig.twitter,
   function(token, tokenSecret, profile, done) {
     done(null, profile);
   }
 ));
+
+// Passport middleware for Facebook Strategy
+passport.use(new FacebookStrategy({
+    clientID: "214423002316040",
+    clientSecret: "622d17f64afd3ced467c01d86bf928e5",
+    callbackURL: "/auth/facebook/callback"
+  }, function(accessToken, refreshToken, profile, done){
+      console.log('Access Token : ', accessToken);
+      console.log('refreshToken : ', refreshToken);
+      done(null, profile);
+  })
+);
 
 // Express 4 boilerplate
 
@@ -122,9 +136,23 @@ app.get('/auth/google/callback',
   // access was granted, the user will be logged in.  Otherwise,
   // authentication has failed.
   app.get('/auth/twitter/callback',
-    passport.authenticate('twitter', { successRedirect: '/',
-                                       failureRedirect: '/login' }));
+    passport.authenticate('twitter', {
+      successRedirect: '/',
+      failureRedirect: '/login'
+    })
+  );
 
+
+app.get('/auth/facebook', passport.authenticate('facebook', {
+    scope:['email user_about_me user_hometown user_location user_website user_work_history']
+  })
+);
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+  })
+);
 
 
 app.get('/user', ensureAuthenticated, function(req, res) {
