@@ -84,6 +84,24 @@ passport.use(new LinkedInStrategy({
   }
 ))
 
+/**
+ * LocalStrategy
+ */
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    User.findOne({ username: username }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (user.password !== password) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+    });
+  }
+));
+
 // Express 4 boilerplate
 
 var app = express();
@@ -96,6 +114,8 @@ var session = require('express-session');
 app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json())
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
@@ -193,6 +213,17 @@ app.get('/auth/linkedin/callback',
     // Successful authentication, redirect home.
     res.redirect('/');
   });
+
+  app.post('/local_login',
+    passport.authenticate('local'), function(req, res) {
+      if(req.user){
+        res.redirect('/login');
+      }
+      console.log('USER:', req.user)
+      console.log('Something wrong');
+      res.end('DONE');
+    }
+  );
 
 app.get('/user', ensureAuthenticated, function(req, res) {
   res.json({
