@@ -4,7 +4,17 @@ var authConfig = require('./config/auth'),
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
   TwitterStrategy = require('passport-twitter').Strategy,
   FacebookStrategy = require('passport-facebook').Strategy
-  LinkedInStrategy = require('passport-linkedin').Strategy;
+  LinkedInStrategy = require('passport-linkedin').Strategy
+  LocalStrategy = require('passport-local').Strategy;
+
+var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
+
+// mongoose model for user
+var User = require('./models/users-schema.js');
+
+// Connect mongodb
+mongoose.connect('mongodb://localhost/webchat');
 
 // Passport session setup.
 //
@@ -85,6 +95,7 @@ var session = require('express-session');
 
 app.use(logger('dev'));
 app.use(cookieParser());
+app.use(bodyParser.json())
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
@@ -186,6 +197,33 @@ app.get('/auth/linkedin/callback',
 app.get('/user', ensureAuthenticated, function(req, res) {
   res.json({
     user: req.user
+  })
+})
+
+/**
+ * Create user with username and password
+ * username be consider as email
+ */
+app.post('/user', function(req, res) {
+  var _data = {
+    "username":req.body.username,
+    "password":req.body.password
+  };
+
+  var user = new User(_data);
+  User.findOne({"username":req.body.username}, function(err, data){
+    if(err){
+      return res.json({"error":"Error while finding user"});
+    }
+
+    if(!data){
+      user.save();
+      response_message = "User created successfully."
+      return res.json({status:response_message});
+    } else {
+      response_message = "User already created."
+      return res.json({status:response_message});
+    }
   })
 })
 
