@@ -214,16 +214,11 @@ app.get('/auth/linkedin/callback',
     res.redirect('/');
   });
 
-  app.post('/local_login',
-    passport.authenticate('local'), function(req, res) {
-      if(req.user){
-        res.redirect('/login');
-      }
-      console.log('USER:', req.user)
-      console.log('Something wrong');
-      res.end('DONE');
-    }
-  );
+app.post('/login',
+  passport.authenticate('local', { failureRedirect: '/login' }),
+    function(req, res) {
+      res.redirect('/');
+  });
 
 app.get('/user', ensureAuthenticated, function(req, res) {
   res.json({
