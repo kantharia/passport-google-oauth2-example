@@ -231,26 +231,39 @@ app.get('/user', ensureAuthenticated, function(req, res) {
  * username be consider as email
  */
 app.post('/user', function(req, res) {
-  var _data = {
-    "username":req.body.username,
-    "password":req.body.password
-  };
+  var getOTP = generateOTP();
 
-  var user = new User(_data);
-  User.findOne({"username":req.body.username}, function(err, data){
-    if(err){
-      return res.json({"error":"Error while finding user"});
+  getOTP.then(function(otp){
+
+    var _data = {
+      "username":req.body.username,
+      "password":req.body.password,
+      "otp":otp,
+      "active": false
     }
 
-    if(!data){
-      user.save();
-      response_message = "User created successfully."
-      return res.json({status:response_message});
-    } else {
-      response_message = "User already created."
-      return res.json({status:response_message});
-    }
-  })
+    var user = new User(_data);
+
+    User.findOne({"username":req.body.username}, function(err, data){
+      if(err){
+        return res.json({"error":"Error while fetcthing user"});
+      }
+
+        if(!data){
+          user.save();
+          response_message = "User created successfully."
+          sendOTPEmail(_data);
+          return res.json({status:response_message});
+        } else {
+          response_message = "User already created."
+          return res.json({status:response_message});
+        }
+    })
+    // res.end('done');
+  }, function(err) {
+    console.log('Got Error : ', err);
+    res.end('done with error');
+  });
 })
 
 app.get('/account', ensureAuthenticated, function(req, res) {
@@ -275,4 +288,54 @@ function ensureAuthenticated(req, res, next) {
     return next();
   }
   res.redirect('/login');
+}
+
+/**
+ * Generate random number for OTP
+ */
+function generateOTP(){
+  var otp = getRandomNumber(5);
+  var _p = new Promise(function(resolve, reject){
+    User.findOne({"otp":otp}, function(err, data){
+      if(err){
+        // Got some error
+        console.log('Error while checking OTP', err);
+        reject(null);
+      }
+
+      if(data){
+        // OPT Already present
+        console.log('OPT Already present');
+        generateOTP();
+      }
+
+      if(!data){
+        // OPT Not allocated to any user
+        console.log('OPT Not allocated to any user :', otp);
+        resolve(otp);
+      }
+    })
+  });
+  return _p;
+}
+
+function getRandomNumber(length){
+  // Calculate zeros
+  function getMaxLimit(limit){
+    var num = '1';
+    for(var i=0; i<limit; i++){
+      num += '0';
+    }
+
+    return Number(num);
+  }
+
+  return Math.round(Math.random()*getMaxLimit(length))
+}
+
+/**
+ * Send OPT email
+ */
+function sendOTPEmail(data){
+  console.log('Sending OTP Email....', data);
 }
