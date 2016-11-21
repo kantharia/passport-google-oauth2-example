@@ -5,13 +5,16 @@ var authConfig = require('./config/auth'),
   TwitterStrategy = require('passport-twitter').Strategy,
   FacebookStrategy = require('passport-facebook').Strategy
   LinkedInStrategy = require('passport-linkedin').Strategy
-  LocalStrategy = require('passport-local').Strategy;
+  LocalStrategy = require('passport-local').Strategy
+  SendMail = require('./modules/sendmail');
 
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
 // mongoose model for user
 var User = require('./models/users-schema.js');
+
+console.log('SendMail :', SendMail);
 
 // Connect mongodb
 mongoose.connect('mongodb://localhost/webchat');
@@ -252,7 +255,7 @@ app.post('/user', function(req, res) {
         if(!data){
           user.save();
           response_message = "User created successfully."
-          sendOTPEmail(_data);
+          SendMail.sendOTPEmail(_data);
           return res.json({status:response_message});
         } else {
           response_message = "User already created."
@@ -264,6 +267,24 @@ app.post('/user', function(req, res) {
     console.log('Got Error : ', err);
     res.end('done with error');
   });
+});
+
+app.get('/activation', function(req, res){
+  res.render('activation');
+})
+
+app.post('/activation', function(req, res){
+  var otp = Number(req.body.otp);
+  User.findOneAndUpdate({"otp":otp}, {"active":true}, {"upsert":false}, function(err, doc){
+    if(err) res.send(500, {error:err})
+    return res.send({"account_activated":true});
+  })
+  //
+  // MyModel.findOneAndUpdate(query, req.newData, {upsert:true}, function(err, doc){
+  //   if (err) return res.send(500, { error: err });
+  //   return res.send("succesfully saved");
+  // });
+  // res.end('Done');
 })
 
 app.get('/account', ensureAuthenticated, function(req, res) {

@@ -18,6 +18,7 @@
     "passport-google-oauth": "^0.2.0",
     "passport-linkedin": "^1.0.0",
     "passport-local": "^1.0.0",
-    "passport-twitter": "^1.0.4"
+    "passport-twitter": "^1.0.4",
+    "sendgrid": "^4.7.1"
   }
 }
