@@ -275,16 +275,16 @@ app.get('/activation', function(req, res){
 
 app.post('/activation', function(req, res){
   var otp = Number(req.body.otp);
+
   User.findOneAndUpdate({"otp":otp}, {"active":true}, {"upsert":false}, function(err, doc){
     if(err) res.send(500, {error:err})
-    return res.send({"account_activated":true});
-  })
-  //
-  // MyModel.findOneAndUpdate(query, req.newData, {upsert:true}, function(err, doc){
-  //   if (err) return res.send(500, { error: err });
-  //   return res.send("succesfully saved");
-  // });
-  // res.end('Done');
+    if(doc){
+      return res.send({"account_activated":true});
+    } else {
+      return res.send({"error":"invalid auth token"});
+    }
+
+  });
 })
 
 app.get('/account', ensureAuthenticated, function(req, res) {
