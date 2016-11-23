@@ -1,4 +1,5 @@
 var authConfig = require('./config/auth'),
+  appConfig = require('./config/app.config'),
   express = require('express'),
   passport = require('passport'),
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
@@ -11,13 +12,21 @@ var authConfig = require('./config/auth'),
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
+var env = process.env.NODE_ENV || 'local';
+var app_host = appConfig[env].app_host;
+
+console.log('Current Env :', env);
+
+console.log('ENV :', appConfig[env].db_host) ;
+
 // mongoose model for user
 var User = require('./models/users-schema.js');
 
-console.log('SendMail :', SendMail);
+// Connect mongodb - Local
+var db_ip = '54.245.40.228';
 
-// Connect mongodb
-mongoose.connect('mongodb://localhost/webchat');
+var db_connection_string = 'mongodb://' + db_ip + '/webchat'
+mongoose.connect(db_connection_string);
 
 // Passport session setup.
 //
@@ -139,29 +148,23 @@ app.get('/', function(req, res) {
   });
 });
 
+// Get Login page
 app.get('/login', function(req, res) {
   res.render('login', {
     user: req.user
   });
 });
 
-// GET /auth/google
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  The first step in Google authentication will involve
-//   redirecting the user to google.com.  After authorization, Google
-//   will redirect the user back to this application at /auth/google/callback
+
+/**
+ * Google Auth Route
+ */
 app.get('/auth/google',
   passport.authenticate('google', {
     scope: ['openid email profile'],
     accessType: 'offline',
     approvalPrompt: 'force'
   }));
-
-// GET /auth/google/callback
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
 app.get('/auth/google/callback',
   passport.authenticate('google', {
     failureRedirect: '/login'
@@ -171,17 +174,11 @@ app.get('/auth/google/callback',
     res.redirect('/');
   });
 
-
-  // Redirect the user to Twitter for authentication.  When complete, Twitter
-  // will redirect the user back to the application at
-  //   /auth/twitter/callback
-  app.get('/auth/twitter', passport.authenticate('twitter'));
-
-  // Twitter will redirect the user to this URL after approval.  Finish the
-  // authentication process by attempting to obtain an access token.  If
-  // access was granted, the user will be logged in.  Otherwise,
-  // authentication has failed.
-  app.get('/auth/twitter/callback',
+/**
+ * Twitter Auth Route
+ */
+app.get('/auth/twitter', passport.authenticate('twitter'));
+app.get('/auth/twitter/callback',
     passport.authenticate('twitter', {
       successRedirect: '/',
       failureRedirect: '/login'
@@ -209,7 +206,6 @@ app.get('/auth/linkedin', passport.authenticate('linkedin',{
     scope: ['r_basicprofile', 'r_emailaddress']
   })
 );
-
 app.get('/auth/linkedin/callback',
   passport.authenticate('linkedin', { failureRedirect: '/login' }),
   function(req, res) {
@@ -217,6 +213,9 @@ app.get('/auth/linkedin/callback',
     res.redirect('/');
   });
 
+/**
+ * Email Login Route
+ */
 app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login' }),
     function(req, res) {
@@ -255,7 +254,7 @@ app.post('/user', function(req, res) {
         if(!data){
           user.save();
           response_message = "User created successfully."
-          SendMail.sendOTPEmail(_data);
+          SendMail.sendOTPEmail(_data, { "app_host": app_host} );
           return res.json({status:response_message});
         } else {
           response_message = "User already created."
@@ -269,10 +268,12 @@ app.post('/user', function(req, res) {
   });
 });
 
+/**
+ * Activation Page and POST Route
+ */
 app.get('/activation', function(req, res){
   res.render('activation');
 })
-
 app.post('/activation', function(req, res){
   var otp = Number(req.body.otp);
 
@@ -287,6 +288,9 @@ app.post('/activation', function(req, res){
   });
 })
 
+/**
+ * User Current User JSON
+ */
 app.get('/account', ensureAuthenticated, function(req, res) {
   res.render('account', {
     user: req.user
@@ -352,11 +356,4 @@ function getRandomNumber(length){
   }
 
   return Math.round(Math.random()*getMaxLimit(length))
-}
-
-/**
- * Send OPT email
- */
-function sendOTPEmail(data){
-  console.log('Sending OTP Email....', data);
 }

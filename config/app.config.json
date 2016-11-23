@@ -1,0 +1,10 @@
+{
+  "local":{
+    "db_host":"localhost",
+    "app_host":"http://localhost"
+  },
+  "dev":{
+    "db_host":"54.245.40.228",
+    "app_host":"https://intro-ooo.herokuapp.com"
+  }
+}

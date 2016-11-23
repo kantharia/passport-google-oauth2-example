@@ -1,0 +1,27 @@
+USER
+====
+/user - POST
+
+
+Social Login
+============
+
+/auth/google - GET
+  - This will open google auth consent screen.
+/auth/google/callback - GET
+  - Authenticate and redirect to home page
+
+/auth/twitter - GET
+  - This will open twitter auth consent screen.
+/auth/twitter/callback - GET
+  - Authenticate and redirect to home page
+
+/auth/facebook - GET
+  - This will open facebook auth consent screen.
+/auth/facebook/callback - GET
+  - Authenticate and redirect to home page
+
+/auth/linkedin - GET
+  - This will open facebook auth consent screen.
+/auth/linkedin/callback - GET
+  - Authenticate and redirect to home page
