@@ -1,9 +1,7 @@
 var helper = require('sendgrid').mail;
 var from_email = new helper.Email('chetan.kantharia@gmail.com');
 var subject = 'Intro.ooo - Account Activation';
-
-var api_key = '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';
-var sg = require('sendgrid')(api_key);
+var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
 
 module.exports = {
   sendOTPEmail: function(data, meta_data){

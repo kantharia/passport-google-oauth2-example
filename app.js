@@ -1,5 +1,5 @@
+require('dotenv').config();
 var authConfig = require('./config/auth'),
-  appConfig = require('./config/app.config'),
   express = require('express'),
   passport = require('passport'),
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
@@ -13,19 +13,17 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
 var env = process.env.NODE_ENV || 'local';
-var app_host = appConfig[env].app_host;
+var app_host = process.env.APP_HOST;
 
-console.log('Current Env :', env);
-
-console.log('ENV :', appConfig[env].db_host) ;
+console.log('APP_HOST', process.env.DB_PASS);
 
 // mongoose model for user
 var User = require('./models/users-schema.js');
 
 // Connect mongodb - Local
-var db_ip = '54.245.40.228';
+var db_host = process.env.DB_HOST;
 
-var db_connection_string = 'mongodb://' + db_ip + '/webchat'
+var db_connection_string = 'mongodb://' + db_host + '/webchat'
 mongoose.connect(db_connection_string);
 
 // Passport session setup.
