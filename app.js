@@ -15,7 +15,7 @@ var bodyParser = require('body-parser');
 var env = process.env.NODE_ENV || 'local';
 var app_host = process.env.APP_HOST;
 
-console.log('APP_HOST', process.env.DB_PASS);
+console.log('APP_HOST', process.env.APP_HOST);
 
 // mongoose model for user
 var User = require('./models/users-schema.js');
