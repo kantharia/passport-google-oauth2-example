@@ -40,11 +40,10 @@ var app = {
     } else {
 
       if(!isEmailValid(username)) {
-        alert("Invalid Email Address");
-      } else {
-        //show error
-        alert("Username or password is blank");
+        alert("Invalid Email Addess")
       }
+      //show error
+      alert("Username or password is blank");
     }
   }
 }

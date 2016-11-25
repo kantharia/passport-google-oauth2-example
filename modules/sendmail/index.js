@@ -1,35 +1,39 @@
-var ses = require('node-ses');
-var client = ses.createClient({
-  key: process.env.AWS_SES_KEY,
-  secret: process.env.AWS_SES_SECRET,
-  amazon:process.env.AWS_SES_SERVER
-});
+var nodemailer = require('nodemailer');
 
-console.log('AWS Server : ', process.env.AWS_SES_SERVER);
+var from = process.env.EMAIL_FROM;
+var pass = process.env.EMAIL_PASSWORD;
+// create reusable transporter object using the default SMTP transport
+var transporter = nodemailer.createTransport('smtps://'+ from +':'+ pass +'@smtp.gmail.com');
 
 var from_email = 'chetan.kantharia@gmail.com';
 var subject = 'Intro.ooo - Account Activation';
 
-
 module.exports = {
   sendOTPEmail: function(data, meta_data){
+    var activationLink = meta_data.app_host+"/activation";
+
     var mailContent = "Please active your account by entering OTP:" + data.otp;
-        mailContent += "<br/><br/>Visit : " + meta_data.app_host +"/activation to activate your account."
+        mailContent += "Visit :" + activationLink +"to activate your account."
+
+    var mailContentHTML = "Please active your account by entering OTP:" + "<b>"+data.otp+"</b>";
+        mailContentHTML += "<br/><br/>Visit : <a href="+activationLink+">" + activationLink +"</a> to activate your account."
     var to_email = data.username;
 
-    client.sendEmail({
-        to: to_email,
-        from: from_email,
-        subject: subject,
-        message: mailContent
-      },
-      function(err, data, res){
-        if(err){
-          console.log('Sending OTP Error:', err);
-        }
-        if(res){
-          console.log('Activation mail sent to:', to_email);
-        }
-     })
+    var mailOptions = {
+      from: from_email, // sender address
+      to: to_email, // list of receivers
+      subject: subject, // Subject line
+      text: mailContent, // plaintext body
+      html: mailContentHTML // html body
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.log(error);
+      }
+      else{
+        console.log('Message sent: ' + info.response);
+      }
+    });
   }
 }

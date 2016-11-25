@@ -296,6 +296,41 @@ app.post('/activation', function(req, res){
 })
 
 /**
+ * Check sub-domain
+ */
+ app.get('/sub-domain', function(req, res){
+   // sd - sub-domain
+   var sd = req.query.sd;
+
+   if(sd){
+     User.findOne({"subdomain":sd}, function(err, doc) {
+
+       // if err and doc is null - means no entry in database
+       if(!err && !doc){
+         return res.status(200).json({
+           "available":true,
+           "suddomain":sd
+         })
+       }
+
+       if(err){
+         return res.status(400).json({
+           "status":"Error while checking subdomain"
+         });
+       }
+
+       if(doc){
+          return res.status(226).json({
+            "available":false,
+            "subdomain":sd
+          })
+       }
+
+     })
+   }
+ })
+
+/**
  * User Current User JSON
  */
 app.get('/account', ensureAuthenticated, function(req, res) {
