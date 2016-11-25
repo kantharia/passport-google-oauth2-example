@@ -146,6 +146,12 @@ app.get('/', function(req, res) {
   });
 });
 
+// Registartion page
+app.get('/signup', function(req, res){
+  res.render('signup',{});
+})
+
+
 // Get Login page
 app.get('/login', function(req, res) {
   res.render('login', {
@@ -231,6 +237,9 @@ app.get('/user', ensureAuthenticated, function(req, res) {
  * username be consider as email
  */
 app.post('/user', function(req, res) {
+
+  console.log('/user got post req');
+
   var getOTP = generateOTP();
 
   getOTP.then(function(otp){
@@ -253,10 +262,10 @@ app.post('/user', function(req, res) {
           user.save();
           response_message = "User created successfully."
           SendMail.sendOTPEmail(_data, { "app_host": app_host} );
-          return res.json({status:response_message});
+          return res.status(200).json({status:response_message});
         } else {
           response_message = "User already created."
-          return res.json({status:response_message});
+          return res.status(409).json({status:response_message});
         }
     })
     // res.end('done');

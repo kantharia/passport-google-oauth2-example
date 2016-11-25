@@ -1,5 +1,26 @@
 {{#if user}}
 	<h2>Hello, {{ user.displayName }}.</h2>
 {{else}}
-	<h2>Welcome! Please log in.</h2>
+	<h2>Welcome to intro</h2>
+	<hr>
+	<h3>Signup</h3>
+	<div id="status" style="background:#EEE">
+
+	</div>
+	<div class="signupform" id="signupform">
+	  <form>
+	  	<div>
+	  	<label>Email:</label>
+	  	<input type="text" name="username" id="username" placeholder="abc@example.com"/><br/>
+	  	</div>
+	  	<div>
+	  	<label>Password:</label>
+	  	<input type="password" name="password" id="password" />
+	  	</div>
+	  	<div>
+	  	<input type="button" value="Signup" onclick="app.signupUser()"/>
+	  	</div>
+	  </form>
+	</div>
+
 {{/if}}
