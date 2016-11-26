@@ -16,6 +16,7 @@
     "morgan": "^1.5.3",
     "node-ses": "^2.0.1",
     "nodemailer": "^2.6.4",
+    "nodemailer-ses-transport": "^1.5.0",
     "nodemailer-smtp-transport": "^2.7.2",
     "passport": "^0.2.1",
     "passport-facebook": "^2.1.1",

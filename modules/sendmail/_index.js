@@ -1,8 +1,9 @@
 var nodemailer = require('nodemailer');
+var ses = require('nodemailer-ses-transport');
 var smtpTransport = require('nodemailer-smtp-transport');
 
-var transporter = nodemailer.createTransport(smtpTransport({
-    host: 'email-smtp.us-west-2.amazonaws.com',
+var smtpTransporter = nodemailer.createTransport(smtpTransport({
+    host: 'email-smtp.us-east-1.amazonaws.com',
     port: 2587,
     auth: {
         user: 'AKIAISKFFHKKLW6XZVDA',
@@ -10,10 +11,19 @@ var transporter = nodemailer.createTransport(smtpTransport({
     }
 }));
 
-console.log('Using SMTP')
-
+var from = process.env.EMAIL_FROM;
+var pass = process.env.EMAIL_PASSWORD;
 // create reusable transporter object using the default SMTP transport
 //var transporter = nodemailer.createTransport('smtps://'+ from +':'+ pass +'@smtp.gmail.com');
+
+
+//AWS credentials
+var transporter = nodemailer.createTransport(ses({
+    accessKeyId: process.env.AWS_SES_KEY_2,
+    secretAccessKey: process.env.AWS_SES_SECRET_2
+}));
+
+console.log('AWS', process.env.AWS_SES_KEY_2);
 
 var from_email = 'chetan.kantharia@gmail.com';
 var subject = 'Intro.ooo - Account Activation - aws';
@@ -37,7 +47,7 @@ module.exports = {
       html: mailContentHTML // html body
     };
 
-    transporter.sendMail(mailOptions, function(error, info) {
+    smtpTransporter.sendMail(mailOptions, function(error, info) {
       if (error) {
         console.log(error);
       }
