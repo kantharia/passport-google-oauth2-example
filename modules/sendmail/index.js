@@ -2,11 +2,11 @@ var nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
 
 var transporter = nodemailer.createTransport(smtpTransport({
-    host: 'email-smtp.us-west-2.amazonaws.com',
-    port: 2587,
+    host: process.env.AWS_SES_SERVER,
+    port: process.env.AWS_SES_PORT,
     auth: {
-        user: 'AKIAISKFFHKKLW6XZVDA',
-        pass: 'ApFw1SzH5OmYkz1vLw7j+RwsLdKxL4WpqifY7GxiT0dE'
+        user: process.env.AWS_SES_KEY,
+        pass: process.env.AWS_SES_SECRET
     }
 }));
 
