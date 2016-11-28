@@ -5,8 +5,9 @@ var authConfig = require('./config/auth'),
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
   TwitterStrategy = require('passport-twitter').Strategy,
   FacebookStrategy = require('passport-facebook').Strategy
-  LinkedInStrategy = require('passport-linkedin').Strategy
-  LocalStrategy = require('passport-local').Strategy
+  LinkedInStrategy = require('passport-linkedin').Strategy,
+  LocalStrategy = require('passport-local').Strategy,
+  OTPStrategy = require('passport-custom').Strategy,
   SendMail = require('./modules/sendmail');
 
 var mongoose = require('mongoose');
@@ -43,11 +44,30 @@ passport.deserializeUser(function(obj, done) {
 });
 
 
-// Use the GoogleStrategy within Passport.
-//   Strategies in Passport require a `verify` function, which accept
-//   credentials (in this case, an accessToken, refreshToken, and Google
-//   profile), and invoke a callback with a user object.
-//   See http://passportjs.org/docs/configure#verify-callback
+/**
+ * OTP Strategy
+ */
+passport.use('otp',new OTPStrategy(
+    function(req, callback){
+      var otp = Number(req.body.otp);
+      console.log('GOT OPT TO VALIDATE', otp);
+      User.findOneAndUpdate({"otp":otp}, {"active":true}, {"upsert":false}, function(err, doc){
+        if(err){ return callback(err);}
+        if(doc){
+          return callback(null, doc);
+          //return res.redirect('/sub-domain');
+          // return res.send({"account_activated":true});
+        } else {
+          return callback(null,false,{"message":"Incorrect OTP"});
+          // return res.send({"error":"invalid auth token"});
+        }
+
+      });
+    }
+  )
+)
+
+// Passport JS
 passport.use(new GoogleStrategy(
 
   // Use the API access settings stored in ./config/auth.json. You must create
@@ -281,24 +301,27 @@ app.post('/user', function(req, res) {
 app.get('/activation', function(req, res){
   res.render('activation');
 })
-app.post('/activation', function(req, res){
-  var otp = Number(req.body.otp);
 
-  User.findOneAndUpdate({"otp":otp}, {"active":true}, {"upsert":false}, function(err, doc){
-    if(err) res.send(500, {error:err})
-    if(doc){
-      return res.send({"account_activated":true});
-    } else {
-      return res.send({"error":"invalid auth token"});
+
+app.post('/otp-access',
+    passport.authenticate('otp', { failureRedirect: '/activation' }),
+      function(req, res) {
+        res.redirect('/sub-domain');
     }
+);
 
-  });
+/**
+ * sub-domain page
+ */
+app.get('/sub-domain', ensureAuthenticated, function(req, res){
+    console.log("Got Use",req.user);
+    res.send('Sub-Domain Here');
 })
 
 /**
  * Check sub-domain
  */
- app.get('/sub-domain', function(req, res){
+ app.get('/check-sub-domain', ensureAuthenticated, function(req, res){
    // sd - sub-domain
    var sd = req.query.sd;
 

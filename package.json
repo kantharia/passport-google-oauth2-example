@@ -19,6 +19,7 @@
     "nodemailer-ses-transport": "^1.5.0",
     "nodemailer-smtp-transport": "^2.7.2",
     "passport": "^0.2.1",
+    "passport-custom": "^1.0.5",
     "passport-facebook": "^2.1.1",
     "passport-google-oauth": "^0.2.0",
     "passport-linkedin": "^1.0.0",
