@@ -4,7 +4,8 @@ var schema = new mongoose.Schema({
   username: String,
   password: String,
   otp: Number,
-  active: Boolean
+  active: Boolean,
+  subdomain: String
 });
 
 module.exports = mongoose.model('users', schema);

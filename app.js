@@ -306,22 +306,22 @@ app.get('/activation', function(req, res){
 app.post('/otp-access',
     passport.authenticate('otp', { failureRedirect: '/activation' }),
       function(req, res) {
-        res.redirect('/sub-domain');
+        res.redirect('/register-subdomain');
     }
 );
 
 /**
  * sub-domain page
  */
-app.get('/sub-domain', ensureAuthenticated, function(req, res){
-    console.log("Got Use",req.user);
-    res.send('Sub-Domain Here');
+app.get('/register-subdomain', ensureAuthenticated, function(req, res){
+    // res.send('Sub-Domain Here');
+    res.render('subdomain',{ user: req.user });
 })
 
 /**
  * Check sub-domain
  */
- app.get('/check-sub-domain', ensureAuthenticated, function(req, res){
+ app.get('/subdomain', ensureAuthenticated, function(req, res){
    // sd - sub-domain
    var sd = req.query.sd;
 
@@ -352,6 +352,39 @@ app.get('/sub-domain', ensureAuthenticated, function(req, res){
      })
    }
  })
+
+
+/**
+ * Register subdomain
+ */
+app.post('/subdomain', ensureAuthenticated, function(req, res){
+
+  console.log('body', req.body);
+  // We will get subdomain and email id
+  var subdomain = req.body.subdomain;
+  var email = req.user.username;
+  var query = { "username" : email };
+
+  // User.update(
+  //   {"username":"chetan.kantharia@gmail.com"},
+  //   {"subdomain":"iii"},
+  //   {"multi":true},
+  //   function(err, doc){
+  //     console.log("ERRR", err);
+  //     console.log('DOC', doc);
+  //   }
+  // )
+
+  User.update({"username":email}, {"subdomain":subdomain}, {"upsert":false}, function(err, doc){
+    if(err){ return res.send({"err":"err"})}
+    if(doc){
+      return res.status(200).send({"status":"success", "message":"subdomain registered"});
+    } else {
+      console.log('FAILED');
+      return res.status(400).send({"status":"failed"});
+    }
+  });
+})
 
 /**
  * User Current User JSON
