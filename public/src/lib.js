@@ -4,6 +4,29 @@ function isEmailValid(email){
   var re = /\S+@\S+\.\S+/;
   return re.test(email);
 }
+
+function getValById(id){
+  return document.getElementById(id).value || null;
+}
+
+function setValById(id,val){
+  return document.getElementById(id).value = val || null;
+}
+
+// Returns array of keys which has null values
+function checkObject(obj){
+  var keysWithNullValues = [];
+  for (var i in obj){
+    if(!obj[i]){
+      keysWithNullValues.push(i);
+    }
+  }
+  return keysWithNullValues;
+}
+
+var get = getValById;
+var set = setValById;
+
 var app = {
   subdomain:'',
   checkSubdomain: function(){
@@ -47,7 +70,8 @@ var app = {
         .then(function(response){
           console.log('Message', response);
           if(response.status === 200){
-            alert(response.data.message);
+            window.location = '/update-profile';
+            // alert(response.data.message);
           }
         })
         .catch(function(err){
@@ -94,6 +118,36 @@ var app = {
       }
       //show error
       alert("Username or password is blank");
+    }
+  },
+  updateProfile: function(){
+    var userObj = {
+      fullname: get('fullname'),
+      dob: get('dob'),
+      age: get('age'),
+      profession: get('profession'),
+      city: get('city'),
+      bio: get('bio')
+    }
+
+    var err_feilds = checkObject(userObj);
+
+    if(err_feilds.length){
+      var str = err_feilds.map(function(d){ return d });
+      alert('Required feilds are : ' + str.join(', '));
+    }
+
+    if(!err_feilds.length){
+      axios.post('/profile', userObj)
+        .then(function(response){
+          if(response.status === 200){
+            window.location = '/';
+          }
+        })
+        .catch(function(error){
+          alert('Something went wrong while saving profile');
+          console.log('Error');
+        })
     }
   }
 }

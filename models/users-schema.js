@@ -5,7 +5,13 @@ var schema = new mongoose.Schema({
   password: String,
   otp: Number,
   active: Boolean,
-  subdomain: String
+  subdomain: String,
+  fullname: String,
+  dob: Date, // ISO Date format (OPTIONAL)
+  age: Number, // (REQUIRED)
+  profession: String,
+  city: String,
+  bio: String // About me
 });
 
 module.exports = mongoose.model('users', schema);

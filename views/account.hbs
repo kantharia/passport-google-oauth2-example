@@ -1,4 +1,6 @@
-<p>{{#each user.photos}}<img src="{{ value }}" alt="Photo of {{ user.displayName }}.">{{/each}}</p>
-<p>ID: {{ user.id }}</p>
-<p>Name: {{ user.displayName }}</p>
-<p>Email: {{#each user.emails}} {{ value }} {{/each}}</p>
+
+<p>Name: {{ user.fullname }}</p>
+<p>Email: {{user.username}}</p>
+<p>Profession: {{user.profession}}</p>
+<p>City: {{user.city}}</p>
+<p>Bio: {{user.bio}}</p>

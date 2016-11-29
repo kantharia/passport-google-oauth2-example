@@ -387,6 +387,39 @@ app.post('/subdomain', ensureAuthenticated, function(req, res){
 })
 
 /**
+ * Profile Registration Page
+ */
+ app.get('/update-profile', ensureAuthenticated, function(req, res) {
+  //  return res.send('Updare Profile Page');
+  return res.render('profile-form');
+ })
+
+ /**
+  * Profile POST Req
+  */
+  app.post('/profile', ensureAuthenticated, function(req, res){
+    req.body.dob = new Date(req.body.dob);
+    console.log('---\nOld Data', req.user);
+    console.log('---\New Data', req.body);
+    User.findOneAndUpdate({ username:req.user.username },
+      req.body, { "upsert":false}, function(err, user){
+
+        console.log('---\nAfter Post :', user);
+
+        if(err){
+          console.log('---\n', err);
+          return res.status(400)
+            .send({"message":"error while saving user profile"});
+        }
+
+        if(user) {
+          return res.status(200)
+            .send({"message":"profile saved successfully"})
+        }
+      });
+  })
+
+/**
  * User Current User JSON
  */
 app.get('/account', ensureAuthenticated, function(req, res) {
