@@ -14,11 +14,14 @@ function setValById(id,val){
 }
 
 // Returns array of keys which has null values
-function checkObject(obj){
+function checkObject(obj, ignoredKeys){
   var keysWithNullValues = [];
+  var ignoredKeys = ignoredKeys || [];
   for (var i in obj){
     if(!obj[i]){
-      keysWithNullValues.push(i);
+      if(ignoredKeys.indexOf(i)<0){
+        keysWithNullValues.push(i);
+      }
     }
   }
   return keysWithNullValues;
@@ -124,13 +127,13 @@ var app = {
     var userObj = {
       fullname: get('fullname'),
       dob: get('dob'),
-      age: get('age'),
+      age: get('age') || 0,
       profession: get('profession'),
       city: get('city'),
       bio: get('bio')
     }
 
-    var err_feilds = checkObject(userObj);
+    var err_feilds = checkObject(userObj, ['dob','age']);
 
     if(err_feilds.length){
       var str = err_feilds.map(function(d){ return d });

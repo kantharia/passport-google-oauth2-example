@@ -7,8 +7,8 @@ var schema = new mongoose.Schema({
   active: Boolean,
   subdomain: String,
   fullname: String,
-  dob: Date, // ISO Date format (OPTIONAL)
-  age: Number, // (REQUIRED)
+  dob: { type:Date, default: new Date('0000-01-01')},// ISO Date format (OPTIONAL)
+  age: { type: Number, default: 0}, // (REQUIRED)
   profession: String,
   city: String,
   bio: String // About me
