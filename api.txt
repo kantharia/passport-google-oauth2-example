@@ -1,0 +1,102 @@
+API Cleanup
+
+1
+Route: /
+Method: GET
+Purpose: Index Page Route
+
+2
+Route: /signup
+Method: GET
+Purpose: Renders Signup Page
+
+3
+Route: /login
+Method: GET
+Purpose: Renders Login Page
+
+4
+Route: /auth/google
+Method: GET
+Purpose: Google Login
+
+5
+Route: /auth/google/callback
+Method: GET
+Purpose: Callback Handler
+
+6
+Route: /auth/twitter
+Method: GET
+Purpose: Twitter Login
+
+7
+Route: /auth/twitter/callback
+Method: GET
+Purpose: Callback Handler
+
+8
+Route: /auth/facebook
+Method: GET
+Purpose: FB Login
+
+9
+Route: /auth/facebook/callback
+Method: GET
+Purpose: Callback Handler
+
+10
+Route: /auth/linkedin
+Method: GET
+Purpose: LinkedIn login
+
+11
+Route: /auth/linkedin/callback
+Method: GET
+Purpose: Callback Handler
+
+12
+Route: /login
+Method: POST
+Purpose: Handles users login submit request
+
+13
+Route: /user
+Method: GET
+Purpose: Get details of current logged in user
+
+14
+Route: /user
+Method: POST
+Purpose: Create new user
+
+15
+Route: /activation
+Method: GET
+Purpose: Get OTP Page
+
+16
+Route: /otp-access
+Method: POST
+Purpose: Validate OTP
+
+17
+GET /register-subdomain
+
+18
+GET /subdomain
+
+19
+POST /subdomain
+
+20
+GET /update-profile
+
+22
+POST /profile
+
+23
+GET /account
+
+24
+GET /logout

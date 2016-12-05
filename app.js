@@ -94,8 +94,7 @@ passport.use(new TwitterStrategy(authConfig.twitter,
 // Passport middleware for Facebook Strategy
 passport.use(new FacebookStrategy(authConfig.facebook,
   function(accessToken, refreshToken, profile, done){
-      console.log('Access Token : ', accessToken);
-      console.log('refreshToken : ', refreshToken);
+      profile.fb_accessToken = accessToken;
       return done(null, profile);
   })
 );
@@ -185,7 +184,7 @@ app.get('/login', function(req, res) {
  */
 app.get('/auth/google',
   passport.authenticate('google', {
-    scope: ['openid email profile'],
+    scope: ['openid email profile','https://gdata.youtube.com'],
     accessType: 'offline',
     approvalPrompt: 'force'
   }));
@@ -213,7 +212,8 @@ app.get('/auth/twitter/callback',
  * Facebook Auth Routes
  */
 app.get('/auth/facebook', passport.authenticate('facebook', {
-    scope:['email user_about_me user_hometown user_location user_website user_work_history']
+    scope:['email user_about_me user_hometown'
+    +' user_location user_website user_work_history publish_actions']
   })
 );
 app.get('/auth/facebook/callback',

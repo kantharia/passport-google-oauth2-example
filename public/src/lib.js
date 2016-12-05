@@ -152,5 +152,18 @@ var app = {
           console.log('Error');
         })
     }
+  },
+  postOnFB: function(token){
+    var fbPost = document.getElementById('fbPost').value;
+    console.log('FB POST', fbPost);
+    var _url = 'https://graph.facebook.com/v2.8/me/feed?access_token='+token;
+    axios.post(_url, {"message":fbPost})
+      .then(function(response){
+        document.getElementById('fbPost').value = "";
+        alert("Publish Successful on FB");
+      })
+      .catch(function(e){
+        console.log('Error');
+      })
   }
 }
