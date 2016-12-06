@@ -154,16 +154,37 @@ var app = {
     }
   },
   postOnFB: function(token){
-    var fbPost = document.getElementById('fbPost').value;
+    var fbPost = getValById('fbPost');
     console.log('FB POST', fbPost);
     var _url = 'https://graph.facebook.com/v2.8/me/feed?access_token='+token;
     axios.post(_url, {"message":fbPost})
       .then(function(response){
-        document.getElementById('fbPost').value = "";
+        setValById('fbPost','');
         alert("Publish Successful on FB");
       })
       .catch(function(e){
-        console.log('Error');
+        console.log('Error in FB Publish');
+      })
+  },
+  postOnTwitter: function(token, tokenSecret){
+    console.log('Token : ', token);
+    console.log('Token Secret : ', tokenSecret);
+    var twitterPost = getValById('twitterPost');
+
+    var twitterClient = axios.create({
+      headers: {
+        'token': token,
+        'token-secret': tokenSecret
+      }
+    });
+
+    twitterClient.post('/twitter/post', {"tweet":twitterPost})
+      .then(function(response){
+        console.log('Response', response);
+        setValById('twitterPost','');
+      })
+      .catch(function(e){
+        console.log('Error in twitter post')
       })
   }
 }

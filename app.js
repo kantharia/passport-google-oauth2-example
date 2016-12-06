@@ -10,6 +10,8 @@ var authConfig = require('./config/auth'),
   OTPStrategy = require('passport-custom').Strategy,
   SendMail = require('./modules/sendmail');
 
+var Twitter = require('twitter');
+
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
@@ -87,6 +89,8 @@ passport.use(new GoogleStrategy(
 // Passport middleware for Twitter Strategy
 passport.use(new TwitterStrategy(authConfig.twitter,
   function(token, tokenSecret, profile, done) {
+    profile.twitter_token = token;
+    profile.twitter_tokenSecret = tokenSecret;
     return done(null, profile);
   }
 ));
@@ -207,6 +211,34 @@ app.get('/auth/twitter/callback',
       failureRedirect: '/login'
     })
   );
+
+/* Temporary API To Post On Twitter */
+app.post('/twitter/post', function(req, res){
+  // Get consumerKey and consumerSecret from config
+  var consumerKey = authConfig.twitter.consumerKey;
+  var consumerSecret = authConfig.twitter.consumerSecret;
+
+  // Get token and tokenSecret from headers
+  var token = req.headers['token'];
+  var tokenSecret = req.headers['token-secret'];
+  var tweet = req.body['tweet'];
+
+  // Twitter Client
+  var twitterClient = new Twitter({
+    consumer_key: consumerKey,
+    consumer_secret: consumerSecret,
+    access_token_key: token,
+    access_token_secret: tokenSecret
+  });
+
+  twitterClient.post('statuses/update',
+    {status:tweet}, function(error, tweet, response) {
+      if(error) throw error;
+      //console.log(tweet);  // Tweet body.
+      //console.log(response);  // Raw response object.
+  });
+  res.send('POST SENT');
+})
 
 /**
  * Facebook Auth Routes

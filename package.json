@@ -25,6 +25,7 @@
     "passport-linkedin": "^1.0.0",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.4",
-    "sendgrid": "^4.7.1"
+    "sendgrid": "^4.7.1",
+    "twitter": "^1.5.0"
   }
 }

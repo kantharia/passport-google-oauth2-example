@@ -35,8 +35,16 @@
 		{{{ body }}}
 
 		{{#if user.fb_accessToken}}
-		<textarea name="name" rows="8" cols="80" id="fbPost"></textarea>
-		<button onclick="app.postOnFB('{{user.fb_accessToken}}')">Share on FB</button>
+			<textarea name="name" rows="8" cols="80" id="fbPost"></textarea>
+			<button onclick="app.postOnFB('{{user.fb_accessToken}}')">Share on FB</button>
+		{{/if}}
+
+		{{#if user.twitter_token }}
+			<textarea name="name" rows="8" cols="80" id="twitterPost"></textarea>
+			<button
+				onclick="app.postOnTwitter('{{user.twitter_token}}','{{user.twitter_tokenSecret}}')">
+				Share on Twitter
+			</button>
 		{{/if}}
 	</body>
 </html>
