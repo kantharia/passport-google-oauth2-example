@@ -5,12 +5,14 @@ var authConfig = require('./config/auth'),
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
   TwitterStrategy = require('passport-twitter').Strategy,
   FacebookStrategy = require('passport-facebook').Strategy
-  LinkedInStrategy = require('passport-linkedin').Strategy,
+  LinkedInStrategy = require('passport-linkedin-oauth2').Strategy,
   LocalStrategy = require('passport-local').Strategy,
   OTPStrategy = require('passport-custom').Strategy,
   SendMail = require('./modules/sendmail');
 
 var Twitter = require('twitter');
+
+var axios = require('axios');
 
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
@@ -105,17 +107,20 @@ passport.use(new FacebookStrategy(authConfig.facebook,
 
 // Passport middleware for LinkedIn Strategy
 passport.use(new LinkedInStrategy({
-    consumerKey: "81o64ppbkdkoky",
-    consumerSecret: "8BjO1VzFBppBXeM1",
+    clientID: "81o64ppbkdkoky",
+    clientSecret: "8BjO1VzFBppBXeM1",
     callbackURL: "/auth/linkedin/callback",
-    profileFields: ['id', 'first-name', 'last-name', 'email-address', 'headline']
+    profileFields: ['id', 'first-name', 'last-name', 'email-address', 'headline'],
+    scope: ['r_basicprofile', 'r_emailaddress', 'w_share'],
+    state: true
   },
-  function(token, tokenSecret, profile, done) {
-    console.log('LinkedIn Token : ', token);
-    console.log('LinkedIn Secret : ', tokenSecret);
+  function(token, refreshToken, profile, done) {
+    profile.linkedin_token = token;
+    profile.linkedin_refreshToken = refreshToken;
     return done(null, profile);
   }
 ))
+
 
 /**
  * LocalStrategy
@@ -258,16 +263,37 @@ app.get('/auth/facebook/callback',
 /**
  * LinkedIn Auth routes
  */
-app.get('/auth/linkedin', passport.authenticate('linkedin',{
-    scope: ['r_basicprofile', 'r_emailaddress']
-  })
-);
+app.get('/auth/linkedin', passport.authenticate('linkedin'));
 app.get('/auth/linkedin/callback',
   passport.authenticate('linkedin', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
     res.redirect('/');
   });
+
+// Temporary post on LinkedIn
+app.post('/linkedin/post', function(req, res){
+
+  var url = "https://api.linkedin.com/v1/people/~/shares?format=json"
+
+  var _body = req.body.payload;
+
+  var linkedinClient = axios.create({
+    headers: {
+      'Content-Type' : 'application/json',
+      'x-li-format': 'json',
+      'Authorization': 'Bearer ' + req.headers['token']
+    }
+  });
+
+ linkedinClient.post(url,_body)
+  .then(function(response){
+    res.status(200).send({"status":"ok","error":false})
+  })
+  .catch(function(e){
+    res.status(400).send({"status":"not ok", "error":true})
+  })
+})
 
 /**
  * Email Login Route

@@ -186,5 +186,35 @@ var app = {
       .catch(function(e){
         console.log('Error in twitter post')
       })
+  },
+  postOnLinkedin: function(token, tokenSecret){
+    console.log('Token :', token);
+    console.log('Secret : ', tokenSecret);
+    var linkedinPost = getValById('linkedinPost');
+
+    var linkedinClient = axios.create({
+      headers: {
+        'token' : token,
+        'token-secret': tokenSecret
+      }
+    });
+
+    var _pay_load = {
+      "comment": linkedinPost,
+      "visibility": {
+        "code": "anyone"
+      }
+    }
+
+    linkedinClient.post('/linkedin/post', { "payload": _pay_load })
+      .then(function(response){
+        console.log('Response :', response);
+        alert("Status Posted!")
+        setValById('linkedinPost','');
+      })
+      .catch(function(e){
+        alert("Error while updating linkedin post")
+        console.log('Something went wrong : ', e)
+      })
   }
 }

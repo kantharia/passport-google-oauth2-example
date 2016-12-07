@@ -46,5 +46,14 @@
 				Share on Twitter
 			</button>
 		{{/if}}
+
+
+		{{#if user.linkedin_token }}
+			<textarea name="name" rows="8" cols="80" id="linkedinPost"></textarea>
+			<button
+				onclick="app.postOnLinkedin('{{user.linkedin_token}}','{{user.linkedin_tokenSecret}}')">
+				Share on LinkedIn
+			</button>
+		{{/if}}
 	</body>
 </html>
